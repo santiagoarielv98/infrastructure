@@ -4,22 +4,16 @@ from aws_cdk import (
     aws_lambda as _lambda,
     aws_apigateway as apigw,
     CfnOutput,
-    CfnParameter,
 )
 from constructs import Construct
 
 class InfrastructureStack(Stack):
 
-    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id: str, environment="dev", **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # Environment parameter
-        env_param = CfnParameter(
-            self, "Environment",
-            description="Deployment environment (dev, main)",
-            default="dev",
-            allowed_values=["dev", "main"]
-        )
+        # Store environment as a fixed value, not as a CloudFormation parameter
+        self.environment = environment
         
         # Create Lambda function with Flask
         hello_lambda = _lambda.Function(
@@ -28,7 +22,7 @@ class InfrastructureStack(Stack):
             code=_lambda.Code.from_asset("lambda/hello_world"),
             handler="app.lambda_handler",
             environment={
-                "ENVIRONMENT": env_param.value_as_string
+                "ENVIRONMENT": self.environment
             },
             timeout=Duration.seconds(30),
             memory_size=256,
@@ -37,12 +31,12 @@ class InfrastructureStack(Stack):
         # Create API Gateway
         api = apigw.LambdaRestApi(
             self, "HelloWorldApi",
-            rest_api_name=f"Hello World API - {env_param.value_as_string}",
+            rest_api_name=f"Hello World API - {self.environment}",
             description="Simple API Gateway with Lambda and Flask",
             handler=hello_lambda,
             proxy=True,
             deploy_options=apigw.StageOptions(
-                stage_name=env_param.value_as_string,
+                stage_name=self.environment,
                 throttling_rate_limit=100,
                 throttling_burst_limit=50,
                 logging_level=apigw.MethodLoggingLevel.INFO,
