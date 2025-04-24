@@ -9,30 +9,25 @@ from constructs import Construct
 
 class InfrastructureStack(Stack):
 
-    def __init__(self, scope: Construct, construct_id: str, environment="dev", **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # Store environment as a fixed value, not as a CloudFormation parameter
-        # self.environment = environment
-        
-        # Create Lambda function with Flask
+        # Create Lambda function
         hello_lambda = _lambda.Function(
-            self, "HelloWorldFunction",
+            self, 
+            "HelloWorldFunction",
             runtime=_lambda.Runtime.PYTHON_3_9,
-            code=_lambda.Code.from_asset("lambda/hello_world"),
             handler="app.lambda_handler",
+            code=_lambda.Code.from_asset("lambda/hello_world"),
             environment={
                 "ENVIRONMENT": self.environment
             },
-            timeout=Duration.seconds(30),
-            memory_size=256,
         )
         
         # Create API Gateway
         api = apigw.LambdaRestApi(
             self, "HelloWorldApi",
-            rest_api_name=f"Hello World API - {self.environment}",
-            description="Simple API Gateway with Lambda and Flask",
+            rest_api_name=f"HelloApi-{self.environment}",
             handler=hello_lambda,
             proxy=True,
             deploy_options=apigw.StageOptions(

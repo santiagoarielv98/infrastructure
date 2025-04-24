@@ -1,66 +1,40 @@
-import os
 import json
-from flask import Flask, jsonify
-
-app = Flask(__name__)
-
-@app.route('/', methods=['GET'])
-def hello():
-    environment = os.environ.get('ENVIRONMENT', 'dev')
-    return jsonify({
-        'message': f'Hello from {environment} environment!',
-        'status': 'success'
-    })
-
-@app.route('/health', methods=['GET'])
-def health():
-    return jsonify({
-        'status': 'healthy'
-    })
+import os
 
 def lambda_handler(event, context):
     """
-    Lambda function handler that processes API Gateway events using Flask
-    """
-    # Get HTTP method and path from the event
-    http_method = event['httpMethod']
-    path = event['path']
+    Simple Lambda function that returns a greeting message.
     
-    # Create WSGI environment
-    environ = {
-        'REQUEST_METHOD': http_method,
-        'PATH_INFO': path,
-        'QUERY_STRING': event.get('queryStringParameters', '') or '',
-        'CONTENT_LENGTH': str(len(event.get('body', '') or '')),
-        'CONTENT_TYPE': event.get('headers', {}).get('Content-Type', ''),
-        'wsgi.version': (1, 0),
-        'wsgi.input': None,
-        'wsgi.errors': None,
-        'wsgi.multithread': False,
-        'wsgi.multiprocess': False,
-        'wsgi.run_once': False,
-        'wsgi.url_scheme': 'https',
-        'SERVER_NAME': 'lambda',
-        'SERVER_PORT': '443',
+    Parameters:
+    event (dict): API Gateway event data
+    context (obj): Runtime information
+    
+    Returns:
+    dict: API Gateway response with status code and body
+    """
+    # Get environment variables
+    environment = os.environ.get('ENVIRONMENT', 'dev')
+    
+    # Process the event
+    path = event.get('path', '')
+    method = event.get('httpMethod', '')
+    
+    # Create response message
+    message = f"Hello from Lambda! You made a {method} request to {path}"
+    
+    # Log information
+    print(f"Request processed in {environment} environment")
+    print(f"Event: {json.dumps(event)}")
+    
+    # Return response
+    return {
+        "statusCode": 200,
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "body": json.dumps({
+            "message": message,
+            "environment": environment,
+            "timestamp": context.get_remaining_time_in_millis()
+        })
     }
-
-    # Process the request with Flask
-    with app.request_context(environ):
-        try:
-            # Handle the request and get the response
-            response = app.full_dispatch_request()
-            
-            return {
-                'statusCode': response.status_code,
-                'headers': dict(response.headers),
-                'body': response.get_data(as_text=True)
-            }
-            
-        except Exception as e:
-            return {
-                'statusCode': 500,
-                'body': json.dumps({
-                    'error': str(e),
-                    'status': 'error'
-                })
-            } 
