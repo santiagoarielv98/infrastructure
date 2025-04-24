@@ -5,25 +5,24 @@ import aws_cdk as cdk
 
 from infrastructure.infrastructure_stack import InfrastructureStack
 
+
 app = cdk.App()
+InfrastructureStack(app, "InfrastructureStack",
+    # If you don't specify 'env', this stack will be environment-agnostic.
+    # Account/Region-dependent features and context lookups will not work,
+    # but a single synthesized template can be deployed anywhere.
 
-# Obtener el entorno del contexto o usar 'dev' por defecto
-env_name = app.node.try_get_context("env") or "dev"
+    # Uncomment the next line to specialize this stack for the AWS Account
+    # and Region that are implied by the current CLI configuration.
 
-# Validar que el entorno sea válido
-if env_name not in ["dev", "prod"]:
-    raise ValueError(f"El entorno '{env_name}' no es válido. Use 'dev' o 'prod'.")
+    # env=cdk.Environment(account=os.getenv('CDK_DEFAULT_ACCOUNT'), region=os.getenv('CDK_DEFAULT_REGION')),
 
-InfrastructureStack(
-    app, 
-    f"InfrastructureStack-{env_name}",
-    environment=env_name,
-    # Especificar la cuenta/región AWS para el despliegue
-    env=cdk.Environment(
-        account='839284599071', 
-        region='us-east-1'
-    ),
-    description=f"Infraestructura para APIs de ejemplo - Entorno: {env_name}"
-)
+    # Uncomment the next line if you know exactly what Account and Region you
+    # want to deploy the stack to. */
+
+    env=cdk.Environment(account='839284599071', region='us-east-1'),
+
+    # For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html
+    )
 
 app.synth()

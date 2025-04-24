@@ -13,7 +13,7 @@ class InfrastructureStack(Stack):
         super().__init__(scope, construct_id, **kwargs)
 
         # Store environment as a fixed value, not as a CloudFormation parameter
-        self.environment = environment
+        # self.environment = environment
         
         # Create Lambda function with Flask
         hello_lambda = _lambda.Function(
