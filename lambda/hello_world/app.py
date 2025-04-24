@@ -13,7 +13,8 @@ def lambda_handler(event, context):
     dict: API Gateway response with status code and body
     """
     # Get environment variables
-    environment = os.environ.get('ENVIRONMENT', 'dev')
+    environment = os.environ.get('ENVIRONMENT', 'unknown')
+    print(f"Environment: {environment}")
     
     # Process the event
     path = event.get('path', '')

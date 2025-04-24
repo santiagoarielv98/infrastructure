@@ -1,0 +1,12 @@
+{
+    "lambda": {
+        "memory_size": 256,
+        "timeout": 60
+    },
+    "environment_vars": {
+        "ENVIRONMENT": "main",
+        "LOG_LEVEL": "INFO",
+        "API_ENDPOINT": "https://api.example.com",
+        "FEATURE_FLAG_NEW_FUNCTIONALITY": "false"
+    }
+}

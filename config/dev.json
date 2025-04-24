@@ -1,0 +1,12 @@
+{
+    "lambda": {
+        "memory_size": 128,
+        "timeout": 30
+    },
+    "environment_vars": {
+        "ENVIRONMENT": "dev",
+        "LOG_LEVEL": "DEBUG",
+        "API_ENDPOINT": "https://api-dev.example.com",
+        "FEATURE_FLAG_NEW_FUNCTIONALITY": "true"
+    }
+}
